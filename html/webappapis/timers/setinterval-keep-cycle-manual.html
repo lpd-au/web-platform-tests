@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<title>setInterval returns to the initial cycle after skipping an execution</title>
+<link rel="help" href="https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#timer-initialisation-steps">
+<script src="/resources/testharness.js"></script>
+<script src="/resources/testharnessreport.js"></script>
+<script>
+  setup({explicit_timeout: true});
+
+  var start, i = 0, times = [], pause = 2500;
+  var expected = [0, 2500, 3000];
+  var interval = setInterval(callback, 1000);
+
+  function callback() {
+    var now = performance.now();
+    switch (i++) {
+      case 0:
+        start = now;
+        setTimeout(artificialDelay, 0);
+        break;
+      case 2:
+        clearInterval(interval);
+        setTimeout(checkResult, 0);
+        break;
+    }
+    times.push(now - start);
+  }
+
+  function artificialDelay() {
+    var waitUntil = start + pause;
+    while (performance.now() < waitUntil) continue;
+  }
+
+  function checkResult() {
+    assert_array_approx_equals(times, expected, 250, 'execution times');
+    done();
+  }
+</script>
+<p>Please wait for several seconds. Keep the tab in focus.
+If a "PASS" result appears the test passes, otherwise it fails.</p>

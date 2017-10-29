@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<title>setInterval does not add callback execution runtime to the next delay</title>
+<link rel="help" href="https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#timer-initialisation-steps">
+<script src="/resources/testharness.js"></script>
+<script src="/resources/testharnessreport.js"></script>
+<script>
+  setup({explicit_timeout: true});
+
+  var start, i = 0, times = [], pause = 500;
+  var expected = [0, 1000, 2000];
+  var interval = setInterval(callback, 1000);
+
+  function callback() {
+    var now = performance.now();
+    switch (i++) {
+      case 0:
+        start = now;
+        break;
+      case 1:
+        artificialDelay();
+        break;
+      case 2:
+        clearInterval(interval);
+        setTimeout(checkResult, 0);
+        break;
+    }
+    times.push(now - start);
+  }
+
+  function artificialDelay() {
+    var waitUntil = start + pause;
+    while (performance.now() < waitUntil) continue;
+  }
+
+  function checkResult() {
+    assert_array_approx_equals(times, expected, 250, 'execution times');
+    done();
+  }
+</script>
+<p>Please wait for a few seconds. Keep the tab in focus.
+If a "PASS" result appears the test passes, otherwise it fails.</p>
