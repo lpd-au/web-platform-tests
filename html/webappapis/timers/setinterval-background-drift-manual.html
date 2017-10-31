@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<title>setInterval will correct for drift in background tabs based on a capped delay of 1 second</title>
+<link rel="help" href="https://html.spec.whatwg.org/multipage/timers-and-user-prompts.html#timer-initialisation-steps">
+<script src="/resources/testharness.js"></script>
+<script src="/resources/testharnessreport.js"></script>
+<script>
+  setup({explicit_timeout: true});
+
+  var start, i = 0, times = [], pause = 1250;
+  var expected = [0, 1250, 2000]; // foreground [0, 1250, 1500]
+  var interval = setInterval(callback, 500);
+
+  function callback() {
+    var now = performance.now();
+    switch (i++) {
+      case 0:
+        start = now;
+        setTimeout(artificialDelay, 0);
+        break;
+      case 2:
+        clearInterval(interval);
+        setTimeout(checkResult, 0);
+        break;
+    }
+    times.push(now - start);
+  }
+
+  function artificialDelay() {
+    var waitUntil = start + pause;
+    while (performance.now() < waitUntil) continue;
+  }
+
+  function checkResult() {
+    assert_array_approx_equals(times, expected, 125, 'execution times');
+    done();
+  }
+</script>
+<p>Please place this tab in the background and reload it via right click,
+then wait for a few seconds. This test is expected to fail while in focus.
+If a "PASS" result appears the test passes, otherwise it fails.</p>
