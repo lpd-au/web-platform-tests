@@ -15,7 +15,7 @@
     switch (i++) {
       case 0:
         start = now;
-        setTimeout(artificialDelay, 0);
+        setTimeout(artificialDelay, 0, now, pause);
         break;
       case 2:
         clearInterval(interval);
@@ -25,8 +25,8 @@
     times.push(now - start);
   }
 
-  function artificialDelay() {
-    var waitUntil = start + pause;
+  function artificialDelay(now, length) {
+    var waitUntil = now + length;
     while (performance.now() < waitUntil) continue;
   }
 
