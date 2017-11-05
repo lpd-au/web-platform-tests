@@ -7,7 +7,7 @@
   setup({explicit_timeout: true});
 
   var start, i = 0, times = [], pause = 2500;
-  var expected = [0, 2500, 3000];
+  var expected = [0, 2500, 3000, 5500, 6000];
   var interval = setInterval(callback, 1000);
 
   function callback() {
@@ -15,9 +15,12 @@
     switch (i++) {
       case 0:
         start = now;
-        setTimeout(artificialDelay, 0);
+        setTimeout(artificialDelay, 0, now, pause);
         break;
       case 2:
+        artificialDelay(now, pause);
+        break;
+      case 4:
         clearInterval(interval);
         setTimeout(checkResult, 0);
         break;
@@ -25,8 +28,8 @@
     times.push(now - start);
   }
 
-  function artificialDelay() {
-    var waitUntil = start + pause;
+  function artificialDelay(now, length) {
+    var waitUntil = now + length;
     while (performance.now() < waitUntil) continue;
   }
 

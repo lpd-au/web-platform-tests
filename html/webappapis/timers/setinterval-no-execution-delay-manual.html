@@ -7,7 +7,7 @@
   setup({explicit_timeout: true});
 
   var start, i = 0, times = [], pause = 500;
-  var expected = [0, 1000, 2000];
+  var expected = [0, 1000];
   var interval = setInterval(callback, 1000);
 
   function callback() {
@@ -15,11 +15,9 @@
     switch (i++) {
       case 0:
         start = now;
+        artificialDelay(now, pause);
         break;
       case 1:
-        artificialDelay();
-        break;
-      case 2:
         clearInterval(interval);
         setTimeout(checkResult, 0);
         break;
@@ -27,8 +25,8 @@
     times.push(now - start);
   }
 
-  function artificialDelay() {
-    var waitUntil = start + pause;
+  function artificialDelay(now, length) {
+    var waitUntil = now + length;
     while (performance.now() < waitUntil) continue;
   }
 
@@ -37,5 +35,5 @@
     done();
   }
 </script>
-<p>Please wait for a few seconds. Keep the tab in focus.
+<p>Please wait for a couple of seconds. Keep the tab in focus.
 If a "PASS" result appears the test passes, otherwise it fails.</p>
